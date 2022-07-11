@@ -21,10 +21,10 @@ mongoose.connect(process.env.DATABASE, { useNewUrlParser: true, useUnifiedTopolo
       server.emit('dbConnected');
    })
    .catch(err => console.log("Erro: ", err));
-// mongoose.Promise = global.Promise;
-// mongoose.connection.on('error', (err) => {
-//    console.log(`Erro: ${err.message}`)
-// });
+mongoose.Promise = global.Promise;
+mongoose.connection.on('error', (err) => {
+   console.log(`Erro: ${err.message}`)
+});
 
 server.use(cors());
 server.use(express.json());
