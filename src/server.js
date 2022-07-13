@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 4000;
 // Conectando ao banco de dados
 mongoose.connect(process.env.DATABASE, { useNewUrlParser: true, useUnifiedTopology: true })
    .then(() => {
-      console.log(`Conectado ao banco de dados: ${process.env.DATABASE}`);
+      console.log(`Conectado ao banco de dados`);
       server.emit('dbConnected');
    })
    .catch(err => console.log("Erro: ", err));
