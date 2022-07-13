@@ -5,9 +5,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const fileupload = require('express-fileupload');
 
-
-
-
+const apiRouter = require('./routes/router');
 
 // Criando o servidor
 const server = express();
@@ -35,9 +33,7 @@ server.use(fileupload());
 server.use(express.static(path.join(__dirname, 'public')));
 
 
-server.get('/ping', (req, res) => {
-   res.json({ pong: true });
-});
+server.use(apiRouter);
 
 
 server.on('dbConnected', () => {
