@@ -6,6 +6,7 @@ specifiers:
   dotenv: ^16.0.1
   express: ^4.18.1
   express-fileupload: ^1.4.0
+  express-validator: ^6.14.2
   jimp: ^0.16.1
   mongoose: ^6.4.4
   nodemon: ^2.0.19
@@ -17,6 +18,7 @@ dependencies:
   dotenv: 16.0.1
   express: 4.18.1
   express-fileupload: 1.4.0
+  express-validator: 6.14.2
   jimp: 0.16.1
   mongoose: 6.4.4
   uuid: 8.3.2
@@ -759,6 +761,14 @@ packages:
       busboy: 1.6.0
     dev: false
 
+  /express-validator/6.14.2:
+    resolution: {integrity: sha512-8XfAUrQ6Y7dIIuy9KcUPCfG/uCbvREctrxf5EeeME+ulanJ4iiW71lWmm9r4YcKKYOCBMan0WpVg7FtHu4Z4Wg==}
+    engines: {node: '>= 8.0.0'}
+    dependencies:
+      lodash: 4.17.21
+      validator: 13.7.0
+    dev: false
+
   /express/4.18.1:
     resolution: {integrity: sha512-zZBcOX9TfehHQhtupq57OF8lFZ3UZi08Y97dwFCkD8p9d/d2Y3M+ykKcwaMDEL+4qyUolgBDX6AblpR3fL212Q==}
     engines: {node: '>= 0.10.0'}
@@ -1058,6 +1068,10 @@ packages:
       phin: 2.9.3
       xhr: 2.6.0
       xtend: 4.0.2
+    dev: false
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: false
 
   /lru-cache/6.0.0:
@@ -1688,6 +1702,11 @@ packages:
   /uuid/8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
+    dev: false
+
+  /validator/13.7.0:
+    resolution: {integrity: sha512-nYXQLCBkpJ8X6ltALua9dRrZDHVYxjJ1wgskNt1lH9fzGjs3tgojGSCBjmEPwkWS1y29+DrizMTW19Pr9uB2nw==}
+    engines: {node: '>= 0.10'}
     dev: false
 
   /vary/1.1.2:
