@@ -1,9 +1,10 @@
 const { v4: uuid } = require('uuid');
 const jimp = require('jimp');
 
-const category = require('../models/Category');
+const Category = require('../models/Category');
 const User = require('../models/User');
 const Ad = require('../models/Ad');
+const State = require('../models/State');
 
 // vai verificar se tem um buffer e vai manipular a imagem
 const addImage = async (buffer) => {
@@ -17,7 +18,7 @@ const addImage = async (buffer) => {
 module.exports = {
    getCategories: async (req, res) => {
       try {
-         const cats = await category.find();
+         const cats = await Category.find();
 
          let categories = [];
 
@@ -99,7 +100,57 @@ module.exports = {
    },
 
    getList: async (req, res) => {
+      let { sort = 'asc', offset = 0, limit = 8, query, category, state } = req.query;
+      let filters = { status: true };
+      let total = 0;
 
+      if (query) {
+         filters.title = { '$regex': query, '$options': 'i' };
+      }
+
+      if (category) {
+         const hasCategory = await Category.findOne({ slug: category });
+         if (hasCategory) {
+            filters.category = hasCategory._id.toString();
+         }
+      }
+
+      if (state) {
+         const hasState = await State.findOne({ name: state.toUpperCase() });
+         if (hasState) {
+            filters.state = hasState._id.toString();
+         }
+      }
+
+      const adsTotal = await Ad.find(filters);
+      total = adsTotal.length;
+
+      const adsData = await Ad.find(filters)
+         .sort({ dateCreated: (sort === 'desc' ? -1 : 1) })
+         .skip(parseInt(offset))
+         .limit(parseInt(limit));
+
+      let ads = [];
+      for (let i in adsData) {
+         let image;
+
+         let defaultImg = adsData[i].images.find(img => img.default === true);
+         if (defaultImg) {
+            image = `${process.env.BASE_URL}/assets/media/ad/${defaultImg.url}`;
+         } else {
+            image = `${process.env.BASE_URL}/assets/media/ad/default.jpg`;
+         }
+
+         ads.push({
+            id: adsData[i]._id,
+            title: adsData[i].title,
+            price: adsData[i].price,
+            priceNegotiable: adsData[i].priceNegotiable,
+            image
+         });
+      }
+
+      res.status(200).json({ ads, total });
    },
 
    getItem: async (req, res) => {
