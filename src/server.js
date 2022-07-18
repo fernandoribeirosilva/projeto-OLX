@@ -30,11 +30,9 @@ server.use(express.urlencoded({ extended: true }));
 server.use(fileupload());
 
 // vai armazenar os arquivos estáticos (css, js, imagens) na pasta public 
-server.use(express.static(path.join(__dirname, 'public')));
-
+server.use(express.static(path.join(__dirname, '..', 'public')));
 
 server.use(apiRouter);
-
 
 server.on('dbConnected', () => {
    server.listen(process.env.PORT, () => {
