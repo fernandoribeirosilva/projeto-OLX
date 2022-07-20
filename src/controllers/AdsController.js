@@ -1,5 +1,6 @@
 const { v4: uuid } = require('uuid');
 const jimp = require('jimp');
+const deleteImages = require('../helpers/deleteImage');
 
 const Category = require('../models/Category');
 const User = require('../models/User');
@@ -48,7 +49,18 @@ module.exports = {
          return;
       }
 
-      if (price) {
+      if (mongoose.Types.ObjectId.isValid(cat)) {
+         res.status(400).json({ error: 'Categoria não existe.' });
+         return;
+      }
+
+      const hasCategory = await Category.findById(cat);
+      if (!hasCategory) {
+         res.status(400).json({ error: 'Categoria não existe.' });
+         return;
+      }
+
+      if (price) { // R$ 8.000,35 = 8000.35
          const priceFormatted = parseFloat(price.replace('.', '').replace(',', '.').replace('R$ ', '')).toFixed(2);
          price = priceFormatted;
       } else {
@@ -230,6 +242,101 @@ module.exports = {
    },
 
    editAction: async (req, res) => {
+      let { id } = req.params;
+      let { title, price, status, priceneg, desc, category, images, token } = req.body;
 
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+         res.status(400).json({ error: 'Id inválido' });
+         return;
+      }
+
+      const ad = await Ad.findById(id);
+      if (!ad) {
+         res.status(400).json({ error: 'Anúncio inexistente.' });
+         return;
+      }
+
+      const user = await User.findOne({ token });
+      if (user._id.toString() !== ad.idUser.toString()) {
+         res.status(400).json({ error: 'Você não tem permissão para editar este anúncio.' });
+         return;
+      }
+
+      let updates = {};
+
+      if (title) {
+         updates.title = title;
+      }
+      if (price) { // R$ 8.000,35 = 8000.35
+         const priceFormatted = parseFloat(price.replace('.', '').replace(',', '.').replace('R$ ', '')).toFixed(2);
+         price = priceFormatted;
+         updates.price = price;
+      }
+      if (priceneg) {
+         updates.priceNegotiable = priceneg;
+      }
+      if (!status || status) {
+         updates.status = status;
+      }
+      if (desc) {
+         updates.description = desc;
+      }
+      if (category) {
+         const hasCategory = await Category.findOne({ slug: category });
+         if (!hasCategory) {
+            res.status(400).json({ error: 'Categoria inexistente.' });
+            return;
+         }
+         updates.category = hasCategory._id.toString();
+      }
+
+      // if (images) {
+      //    updates.images = images;
+      // }
+
+
+
+      //TODO: Novas images
+      let newImages = [];
+      if (req.files && req.files.img) {
+         // quando for enviado uma imagem
+         if (req.files.img.length === undefined) {
+            console.log('enviou uma imagem');
+            if (['image/png', 'image/jpg', 'image/jpeg'].includes(req.files.img.mimetype)) {
+               let url = await addImage(req.files.img.data);
+               newImages.push({
+                  url,
+                  default: false
+               });
+            }
+         } else {// quando for enviado mais de uma imagem
+            console.log('enviou mais de uma imagem');
+            for (let i = 0; i < req.files.img.length; i++) {
+               if (['image/png', 'image/jpg', 'image/jpeg'].includes(req.files.img[i].mimetype)) {
+                  let url = await addImage(req.files.img[i].data);
+                  newImages.push({
+                     url,
+                     default: false
+                  });
+               }
+            };
+         }
+      }
+
+      if (newImages.length > 0) {
+         newImages[0].default = true;
+         // console.log('teste', newImages);
+         //Deletando as antigas imagens do anuncio
+         deleteImages(ad);
+      } else { //Caso não seja enviada imagem coloca o imagem 'default..jpg'
+         images = [{ url: 'default.jpg', default: true }];
+         deleteImages(ad);
+      }
+
+      updates.images = newImages;
+
+      await Ad.findByIdAndUpdate(id, updates, { new: true });
+
+      res.status(200).json({ error: '' });
    },
 }
